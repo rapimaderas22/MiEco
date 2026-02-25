@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanzasPro - Control Financiero Personal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/fontsource-inter@5.0.0/index.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        accent: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .glass-effect {
+            background: rgba(31, 41, 55, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .gradient-primary {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+        }
+        
+        .gradient-accent {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+        }
+        
+        .gradient-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+        }
+        
+        .gradient-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+        }
+        
+        .gradient-purple {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+        }
+        
+        .gradient-slate {
+            background: linear-gradient(135deg, #64748b 0%, #475569 50%, #334155 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+        
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-hover:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px -5px rgba(34, 197, 94, 0.4);
+        }
+        
+        .chat-message {
+            animation: slideUp 0.4s ease-out;
+        }
+        
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+        }
+        
+        .progress-bar {
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #22c55e, #16a34a);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #16a34a, #15803d);
+        }
+        
+        .input-focus:focus {
+            border-color: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-item.active::after {
+            transform: translateX(-50%) scaleX(1);
+        }
+        
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(34,197,94,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .glow {
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+        }
+        
+        .glow-blue {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .glow-purple {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white min-h-screen">
+    <!-- Background Effects -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl floating"></div>
+        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-accent-500/10 rounded-full blur-3xl floating" style="animation-delay: 1.5s;"></div>
+        <div class="absolute top-1/2 left-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl floating" style="animation-delay: 3s;"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="glass-effect fixed w-full z-50 border-b border-gray-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-18">
+                <div class="flex items-center space-x-3">
+                    <div class="w-11 h-11 gradient-primary rounded-xl flex items-center justify-center glow">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold bg-gradient-to-r from-primary-400 to-primary-300 bg-clip-text text-transparent">FinanzasPro</span>
+                        <p class="text-xs text-gray-500">Control Financiero</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-2">
+                    <button onclick="showSection('dashboard')" class="nav-btn nav-item active px-5 py-2.5 rounded-xl hover:bg-gray-800/50 transition text-sm font-medium">
+                        📊 Dashboard
+                    </button>
+                    <button onclick="showSection('transactions')" class="nav-btn nav-item px-5 py-2.5 rounded-xl hover:bg-gray-800/50 transition text-sm font-medium">
+                        💳 Transacciones
+                    </button>
+                    <button onclick="showSection('cajas')" class="nav-btn nav-item px-5 py-2.5 rounded-xl hover:bg-gray-800/50 transition text-sm font-medium">
+                        🏦 Cajas
+                    </button>
+                    <button onclick="showSection('assistant')" class="nav-btn nav-item px-5 py-2.5 rounded-xl hover:bg-gray-800/50 transition text-sm font-medium">
+                        🤖 Asistente IA
+                    </button>
+                    <button onclick="showSection('reports')" class="nav-btn nav-item px-5 py-2.5 rounded-xl hover:bg-gray-800/50 transition text-sm font-medium">
+                        📈 Reportes
+                    </button>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="toggleModal('addTransactionModal')" class="gradient-primary px-5 py-2.5 rounded-xl font-semibold btn-hover text-sm flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span>Nuevo</span>
+                    </button>
+                    <div class="w-10 h-10 rounded-xl gradient-slate flex items-center justify-center border border-gray-700">
+                        <span class="font-semibold text-sm">US</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-24 pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section animate-fade-in">
+            <!-- Welcome Banner -->
+            <div class="gradient-primary rounded-3xl p-8 mb-8 glow relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+                <div class="relative z-10">
+                    <h1 class="text-3xl font-bold mb-2">¡Bienvenido a tu Control Financiero! 👋</h1>
+                    <p class="text-primary-100/80 mb-4">Gestiona tus ingresos, egresos y alcanza tus metas financieras</p>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="bg-white/20 backdrop-blur rounded-xl px-4 py-2">
+                            <span class="text-xs text-primary-100">Moneda</span>
+                            <p class="font-semibold">🇨🇴 Pesos Colombianos</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur rounded-xl px-4 py-2">
+                            <span class="text-xs text-primary-100">Última actualización</span>
+                            <p class="font-semibold" id="lastUpdate">Ahora</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="glass-effect rounded-2xl p-6 card-hover stat-card border border-gray-800/50">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-gray-400 text-sm font-medium mb-1">Balance Total</h3>
+                            <p class="text-3xl font-bold text-white" id="totalBalance">$0</p>
+                        </div>
+                        <div class="w-14 h-14 gradient-accent rounded-2xl flex items-center justify-center glow-blue">
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 text-sm">
+                        <span class="text-primary-400 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                            Actualizado
+                        </span>
+                        <span class="text-gray-500">ahora</span>
+                    </div>
+                </div>
+
+                <div class="glass-effect rounded-2xl p-6 card-hover stat-card border border-gray-800/50">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-gray-400 text-sm font-medium mb-1">Ingresos del Mes</h3>
+                            <p class="text-3xl font-bold text-primary-400" id="monthlyIncome">$0</p>
+                        </div>
+                        <div class="w-14 h-14 gradient-primary rounded-2xl flex items-center justify-center glow">
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 text-sm">
+                        <span class="text-primary-400">↑</span>
+                        <span class="text-gray-500">Este mes</span>
+                    </div>
+                </div>
+
+                <div class="glass-effect rounded-2xl p-6 card-hover stat-card border border-gray-800/50">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-gray-400 text-sm font-medium mb-1">Egresos del Mes</h3>
+                            <p class="text-3xl font-bold text-red-400" id="monthlyExpenses">$0</p>
+                        </div>
+                        <div class="w-14 h-14 gradient-danger rounded-2xl flex items-center justify-center">
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 text-sm">
+                        <span class="text-red-400">↓</span>
+                        <span class="text-gray-500">Este mes</span>
+                    </div>
+                </div>
+
+                <div class="glass-effect rounded-2xl p-6 card-hover stat-card border border-gray-800/50">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-gray-400 text-sm font-medium mb-1">Tasa de Ahorro</h3>
+                            <p class="text-3xl font-bold text-purple-400" id="savingsRate">0%</p>
+                        </div>
+                        <div class="w-14 h-14 gradient-purple rounded-2xl flex items-center justify-center glow-purple">
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 text-sm">
+                        <span class="text-gray-500">Objetivo:</span>
+                        <span class="text-purple-400 font-medium">20%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cash Boxes -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Caja Chica -->
+                <div class="glass-effect rounded-2xl p-6 card-hover border border-gray-800/50 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-2xl"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-14 h-14 gradient-primary rounded-2xl flex items-center justify-center glow">
+                                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold">Caja Chica</h3>
+                                    <p class="text-sm text-gray-400">Gastos operativos diarios</p>
+                                </div>
+                            </div>
+                            <button onclick="transferMoney('chica')" class="px-4 py-2 bg-gray-800/80 rounded-xl hover:bg-gray-700/80 transition text-sm font-medium border border-gray-700">
+                                ↗ Transferir
+                            </button>
+                        </div>
+                        <p class="text-4xl font-bold text-primary-400 mb-4" id="cajaChicaBalance">$0</p>
+                        <div class="bg-gray-800/80 rounded-full h-4 mb-3 overflow-hidden">
+                            <div class="gradient-primary h-4 rounded-full progress-bar" id="cajaChicaProgress" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-sm mb-4">
+                            <span class="text-gray-400">Límite mensual: $5.000.000</span>
+                            <span class="text-primary-400 font-medium" id="cajaChicaPercentage">0%</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1.5 bg-primary-900/50 text-primary-400 rounded-full text-xs font-medium border border-primary-700/50">✓ Disponible</span>
+                            <span class="px-3 py-1.5 bg-gray-800 text-gray-400 rounded-full text-xs font-medium border border-gray-700">Operativo</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Caja Grande -->
+                <div class="glass-effect rounded-2xl p-6 card-hover border border-gray-800/50 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-accent-500/10 rounded-full blur-2xl"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-14 h-14 gradient-accent rounded-2xl flex items-center justify-center glow-blue">
+                                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold">Caja Grande</h3>
+                                    <p class="text-sm text-gray-400">Reserva de capital / Ahorro</p>
+                                </div>
+                            </div>
+                            <button onclick="transferMoney('grande')" class="px-4 py-2 bg-gray-800/80 rounded-xl hover:bg-gray-700/80 transition text-sm font-medium border border-gray-700">
+                                ↗ Transferir
+                            </button>
+                        </div>
+                        <p class="text-4xl font-bold text-accent-400 mb-4" id="cajaGrandeBalance">$0</p>
+                        <div class="bg-gray-800/80 rounded-full h-4 mb-3 overflow-hidden">
+                            <div class="gradient-accent h-4 rounded-full progress-bar" id="cajaGrandeProgress" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-sm mb-4">
+                            <span class="text-gray-400">Fondo emergencia: 3-6 meses</span>
+                            <span class="text-accent-400 font-medium" id="cajaGrandePercentage">0%</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1.5 bg-accent-900/50 text-accent-400 rounded-full text-xs font-medium border border-accent-700/50">✓ Reserva</span>
+                            <span class="px-3 py-1.5 bg-gray-800 text-gray-400 rounded-full text-xs font-medium border border-gray-700">Largo plazo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Income vs Expenses Chart -->
+                <div class="glass-effect rounded-2xl p-6 border border-gray-800/50">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-bold">📈 Ingresos vs Egresos (30 días)</h3>
+                        <div class="flex space-x-2">
+                            <span class="flex items-center text-xs text-gray-400">
+                                <span class="w-3 h-3 bg-primary-500 rounded-full mr-2"></span>Ingresos
+                            </span>
+                            <span class="flex items-center text-xs text-gray-400">
+                                <span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>Egresos
+                            </span>
+                        </div>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="incomeExpenseChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Categories Chart -->
+                <div class="glass-effect rounded-2xl p-6 border border-gray-800/50">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-bold">🥧 Gastos por Categoría</h3>
+                        <span class="text-xs text-gray-400">Este mes</span>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="categoriesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="glass-effect rounded-2xl p-6 border border-gray-800/50">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold">💳 Transacciones Recientes</h3>
+                        <p class="text-sm text-gray-400">Últimos movimientos registrados</p>
+                    </div>
+                    <button onclick="showSection('transactions')" class="text-primary-400 hover:text-primary-300 text-sm font-medium flex items-center">
+                        Ver todas
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="space-y-3" id="recentTransactions">
+                    <!-- Transactions will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Transactions Section -->
+        <section id="transactions" class="section hidden animate-fade-in">
+            <div class="glass-effect rounded-2xl p-6 border border-gray-800/50">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-2xl font-bold">💳 Todas las Transacciones</h3>
+                        <p class="text-sm text-gray-400">Historial completo de movimientos</p>
+                    </div>
+                    <div class="flex space-x-3">
+                        <select id="filterType" class="bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm input-focus">
+                            <option value="all">Todos</option>
+                            <option value="income">Ingresos</option>
+                            <option value="expense">Egresos</option>
+                        </select>
+                        <select id="filterMonth" class="bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-2.5 text-sm input-focus">
+                            <option value="all">Todos los meses</option>
+                            <option value="1">Enero</option>
+                            <option value="2">Febrero</option>
+                            <option value="3">Marzo</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Mayo</option>
+                            <option value="6">Junio</option>
+                            <option value="7">Julio</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left text-gray-400 text-sm border-b border-gray-800">
+                                <th class="pb-4 font-medium">Fecha</th>
+                                <th class="pb-4 font-medium">Descripción</th>
+                                <th class="pb-4 font-medium">Categoría</th>
+                                <th class="pb-4 font-medium">Tipo</th>
+                                <th class="pb-4 font-medium">Caja</th>
+                                <th class="pb-4 font-medium">Monto</th>
+                                <th class="pb-4 font-medium">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTable">
+                            <!-- Transactions will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cajas Section -->
+        <section id="cajas" class="section hidden animate-fade-in">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Caja Chica Detail -->
+                <div class="glass-effect rounded-2xl p-6 border border-gray-800/50">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="w-14 h-14 gradient-primary rounded-2xl flex items-center justify-center glow">
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">Caja Chica - Detalle</h3>
+                            <p class="text-sm text-gray-400">Gastos operativos diarios</p>
+                        </div>
+                    </div>
+                    <p class="text-4xl font-bold text-primary-400 mb-6" id="cajaChicaDetailBalance">$0</p>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center p-4 bg-gray-800/60 rounded-xl border border-gray-700/50">
+                            <span class="text-gray-400">Límite Mensual</span>
+                            <span class="font-semibold">$5.000.000</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 bg-gray-800/60 rounded-xl border border-gray-700/50">
+                            <span class="text-gray-400">Gastado este mes</span>
+                            <span class="font-semibold text-red-400" id="cajaChicaSpent">$0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 bg-gray-800/60 rounded-xl border border-gray-700/50">
+                            <span class="text-gray-400">Disponible</span>
+                            <span class="font-semibold text-primary-400" id="cajaChicaAvailable">$0</span>
+                        </div>
+                    </div>
+                    <h4 class="font-bold mt-6 mb-3">📋 Movimientos Recientes</h4>
+                    <div class="space-y-2 max-h-64 overflow-y-auto" id="cajaChicaMovements">
+                        <!-- Movements will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Caja Grande Detail -->
+                <div class="glass-effect rounded-2xl p-6 border border-gray-800/50">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="w-14 h-14 gradient-accent rounded-2xl flex items-center justify-center glow-blue">
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">Caja Grande - Detalle</h3>
+                            <p class="text-sm text-gray-400">Reserva de capital / Ahorro</p>
+                        </div>
+                    </div>
+                    <p class="text-4xl font-bold text-accent-400 mb-6" id="cajaGrandeDetailBalance">$0</p>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center p-4 bg-gray-800/60 rounded-xl border border-gray-700/50">
+                            <span class="text-gray-400">Fondo de Emergencia Objetivo</span>
+                            <span class="font-semibold">$30.000.000</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 bg-gray-800/60 rounded-xl border border-gray-700/50">
+                            <span class="text-gray-400">Progreso</span>
+                            <span class="font-semibold text-accent-400" id="cajaGrandeProgressText">0%</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 bg-gray-800/60 rounded-xl border border-gray-700/50">
+                            <span class="text-gray-400">Meses cubiertos</span>
+                            <span class="font-semibold text-primary-400" id="monthsCovered">0 meses</span>
+                        </div>
+                    </div>
+                    <h4 class="font-bold mt-6 mb-3">📋 Movimientos Recientes</h4>
+                    <div class="space-y-2 max-h-64 overflow-y-auto" id="cajaGrandeMovements">
+                        <!-- Movements will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transfer Between Boxes -->
+            <div class="glass-effect rounded-2xl p-6 border border-gray-800/50">
+                <h3 class="text-xl font-bold mb-2">🔄 Transferir entre Cajas</h3>
+                <p class="text-sm text-gray-400 mb-6">Mueve dinero entre Caja Chica y Caja Grande fácilmente</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Desde</label>
+                        <select id="transferFrom" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus">
+                            <option value="chica">Caja Chica</option>
+                            <option value="grande">Caja Grande</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Monto (COP)</label>
+                        <input type="number" id="transferAmount" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus" placeholder="$0">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Hasta</label>
+                        <select id="transferTo" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus">
+                            <option value="grande">Caja Grande</option>
+                            <option value="chica">Caja Chica</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="executeTransfer()" class="w-full mt-6 gradient-accent py-4 rounded-xl font-semibold btn-hover">
+                    🚀 Realizar Transferencia
+                </button>
+            </div>
+        </section>
+
+        <!-- AI Assistant Section -->
+        <section id="assistant" class="section hidden animate-fade-in">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Chat Interface -->
+                <div class="lg:col-span-2 glass-effect rounded-2xl border border-gray-800/50 overflow-hidden">
+                    <div class="p-6 border-b border-gray-800/50">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 gradient-purple rounded-xl flex items-center justify-center glow-purple">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">🤖 Asistente Financiero IA</h3>
+                                <p class="text-sm text-gray-400">Tu asesor financiero personal 24/7</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="h-96 overflow-y-auto p-6 space-y-4" id="chatMessages">
+                        <div class="chat-message flex items-start space-x-3">
+                            <div class="w-9 h-9 gradient-purple rounded-full flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="bg-gray-800/80 rounded-2xl rounded-tl-none px-5 py-3 max-w-md border border-gray-700/50">
+                                <p class="text-sm">¡Hola! 👋 Soy tu asistente financiero personal. Analizo tus ingresos y egresos en pesos colombianos para ayudarte a mejorar tu economía. ¿En qué puedo ayudarte hoy?</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 border-t border-gray-800/50">
+                        <div class="flex space-x-3">
+                            <input type="text" id="chatInput" class="flex-1 bg-gray-800/80 border border-gray-700 rounded-xl px-5 py-3 input-focus" placeholder="Escribe tu pregunta...">
+                            <button onclick="sendMessage()" class="gradient-purple px-6 py-3 rounded-xl font-semibold btn-hover">
+                                Enviar
+                            </button>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mt-4">
+                            <button onclick="quickQuestion('¿Cuál es mi tasa de ahorro?')" class="px-4 py-2 bg-gray-800/80 rounded-full text-xs hover:bg-gray-700/80 transition border border-gray-700">💰 Tasa de ahorro</button>
+                            <button onclick="quickQuestion('¿Cómo puedo reducir gastos?')" class="px-4 py-2 bg-gray-800/80 rounded-full text-xs hover:bg-gray-700/80 transition border border-gray-700">📉 Reducir gastos</button>
+                            <button onclick="quickQuestion('¿Tengo fondo de emergencia suficiente?')" class="px-4 py-2 bg-gray-800/80 rounded-full text-xs hover:bg-gray-700/80 transition border border-gray-700">🛡️ Fondo emergencia</button>
+                            <button onclick="quickQuestion('Análisis del mes')" class="px-4 py-2 bg-gray-800/80 rounded-full text-xs hover:bg-gray-700/80 transition border border-gray-700">📊 Análisis mensual</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Insights -->
+                <div class="space-y-6">
+                    <!-- Daily Analysis -->
+                    <div class="glass-effect rounded-2xl p-6 border border-gray-800/50">
+                        <h3 class="font-bold mb-4 flex items-center">📊 Análisis Diario</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-3 bg-gray-800/60 rounded-xl">
+                                <span class="text-sm text-gray-400">Gasto promedio diario</span>
+                                <span class="font-semibold" id="avgDailyExpense">$0</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-800/60 rounded-xl">
+                                <span class="text-sm text-gray-400">Ingreso promedio diario</span>
+                                <span class="font-semibold text-primary-400" id="avgDailyIncome">$0</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-800/60 rounded-xl">
+                                <span class="text-sm text-gray-400">Balance diario</span>
+                                <span class="font-semibold" id="dailyBalance">$0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendations -->
+                    <div class="glass-effect rounded-2xl p-6 border border-gray-800/50">
+                        <h3 class="font-bold mb-4 flex items-center">💡 Recomendaciones</h3>
+                        <div class="space-y-3" id="aiRecommendations">
+                            <!-- Recommendations will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Risk Level -->
+                    <div class="glass-effect rounded-2xl p-6 border border-gray-800/50">
+                        <h3 class="font-bold mb-4 flex items-center">⚠️ Nivel de Riesgo</h3>
+                        <div class="text-center">
+                            <div class="w-28 h-28 mx-auto rounded-full border-4 border-gray-700 flex items-center justify-center mb-3" id="riskIndicator">
+                                <span class="text-3xl font-bold">--</span>
+                            </div>
+                            <p class="text-sm text-gray-400" id="riskDescription">Calculando...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reports Section -->
+        <section id="reports" class="section hidden animate-fade-in">
+            <div class="glass-effect rounded-2xl p-6 border border-gray-800/50 mb-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-2xl font-bold">📈 Reportes Financieros</h3>
+                        <p class="text-sm text-gray-400">Genera y exporta tus reportes</p>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button onclick="exportReport('pdf')" class="px-5 py-2.5 bg-red-600/80 rounded-xl hover:bg-red-700/80 transition text-sm font-medium border border-red-500/50">
+                            📄 PDF
+                        </button>
+                        <button onclick="exportReport('excel')" class="px-5 py-2.5 bg-primary-600/80 rounded-xl hover:bg-primary-700/80 transition text-sm font-medium border border-primary-500/50">
+                            📊 Excel
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Report Period Selection -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Periodo</label>
+                        <select id="reportPeriod" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus">
+                            <option value="weekly">Semanal</option>
+                            <option value="monthly">Mensual</option>
+                            <option value="yearly">Anual</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Mes</label>
+                        <select id="reportMonth" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus">
+                            <option value="1">Enero</option>
+                            <option value="2">Febrero</option>
+                            <option value="3">Marzo</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Mayo</option>
+                            <option value="6">Junio</option>
+                            <option value="7">Julio</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Año</label>
+                        <select id="reportYear" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus">
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="generateReport()" class="w-full gradient-primary py-3 rounded-xl font-semibold btn-hover">
+                            ✨ Generar Reporte
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Summary -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="glass-effect rounded-2xl p-6 border border-gray-800/50">
+                    <h4 class="text-gray-400 text-sm mb-2">Total Ingresos</h4>
+                    <p class="text-3xl font-bold text-primary-400" id="reportIncome">$0</p>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 border border-gray-800/50">
+                    <h4 class="text-gray-400 text-sm mb-2">Total Egresos</h4>
+                    <p class="text-3xl font-bold text-red-400" id="reportExpenses">$0</p>
+                </div>
+                <div class="glass-effect rounded-2xl p-6 border border-gray-800/50">
+                    <h4 class="text-gray-400 text-sm mb-2">Balance Neto</h4>
+                    <p class="text-3xl font-bold" id="reportBalance">$0</p>
+                </div>
+            </div>
+
+            <!-- Detailed Report Table -->
+            <div class="glass-effect rounded-2xl p-6 border border-gray-800/50">
+                <h3 class="text-xl font-bold mb-6">📋 Desglose por Categoría</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left text-gray-400 text-sm border-b border-gray-800">
+                                <th class="pb-4 font-medium">Categoría</th>
+                                <th class="pb-4 font-medium">Ingresos</th>
+                                <th class="pb-4 font-medium">Egresos</th>
+                                <th class="pb-4 font-medium">Balance</th>
+                                <th class="pb-4 font-medium">% del Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTable">
+                            <!-- Report data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Add Transaction Modal -->
+    <div id="addTransactionModal" class="modal-overlay fixed inset-0 hidden items-center justify-center z-50">
+        <div class="glass-effect rounded-3xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-gray-800/50 animate-slide-up">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-2xl font-bold">➕ Nuevo Movimiento</h3>
+                    <p class="text-sm text-gray-400">Registra un ingreso o egreso</p>
+                </div>
+                <button onclick="toggleModal('addTransactionModal')" class="text-gray-400 hover:text-white p-2 hover:bg-gray-800 rounded-xl transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="transactionForm" onsubmit="addTransaction(event)">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Tipo *</label>
+                        <select id="transType" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus" required>
+                            <option value="income">💚 Ingreso</option>
+                            <option value="expense">❤️ Egreso</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Monto (COP) *</label>
+                        <input type="number" id="transAmount" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus" placeholder="$0" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Fecha *</label>
+                        <input type="date" id="transDate" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Categoría *</label>
+                        <select id="transCategory" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus" required>
+                            <option value="">Seleccionar...</option>
+                            <optgroup label="💚 Ingresos">
+                                <option value="salario">Salario</option>
+                                <option value="ventas">Ventas</option>
+                                <option value="inversiones">Inversiones</option>
+                                <option value="otros_ingresos">Otros Ingresos</option>
+                            </optgroup>
+                            <optgroup label="❤️ Egresos">
+                                <option value="alimentos">Alimentos</option>
+                                <option value="transporte">Transporte</option>
+                                <option value="servicios">Servicios</option>
+                                <option value="entretenimiento">Entretenimiento</option>
+                                <option value="salud">Salud</option>
+                                <option value="educacion">Educación</option>
+                                <option value="otros_gastos">Otros Gastos</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Caja *</label>
+                        <select id="transBox" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus" required>
+                            <option value="chica">🟢 Caja Chica</option>
+                            <option value="grande">🔵 Caja Grande</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Método de Pago</label>
+                        <select id="transPayment" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus">
+                            <option value="efectivo">💵 Efectivo</option>
+                            <option value="transferencia">🏦 Transferencia</option>
+                            <option value="tarjeta">💳 Tarjeta</option>
+                            <option value="otro">📱 Otro</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm text-gray-400 mb-2">Descripción</label>
+                        <input type="text" id="transDescription" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus" placeholder="Descripción del movimiento">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm text-gray-400 mb-2">Prioridad (Egresos)</label>
+                        <select id="transPriority" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus">
+                            <option value="bajo">🟢 Bajo</option>
+                            <option value="medio">🟡 Medio</option>
+                            <option value="alto">🔴 Alto</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-4 mt-8">
+                    <button type="button" onclick="toggleModal('addTransactionModal')" class="flex-1 px-6 py-3.5 bg-gray-800 rounded-xl hover:bg-gray-700 transition font-medium border border-gray-700">Cancelar</button>
+                    <button type="submit" class="flex-1 gradient-primary px-6 py-3.5 rounded-xl font-semibold btn-hover">Guardar Movimiento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Transfer Modal -->
+    <div id="transferModal" class="modal-overlay fixed inset-0 hidden items-center justify-center z-50">
+        <div class="glass-effect rounded-3xl p-8 max-w-md w-full mx-4 border border-gray-800/50 animate-slide-up">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-xl font-bold">🔄 Transferir entre Cajas</h3>
+                    <p class="text-sm text-gray-400">Mueve dinero fácilmente</p>
+                </div>
+                <button onclick="toggleModal('transferModal')" class="text-gray-400 hover:text-white p-2 hover:bg-gray-800 rounded-xl transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form onsubmit="executeTransfer(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Desde</label>
+                        <select id="modalTransferFrom" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus">
+                            <option value="chica">🟢 Caja Chica</option>
+                            <option value="grande">🔵 Caja Grande</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Hasta</label>
+                        <select id="modalTransferTo" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus">
+                            <option value="grande">🔵 Caja Grande</option>
+                            <option value="chica">🟢 Caja Chica</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Monto (COP) *</label>
+                        <input type="number" id="modalTransferAmount" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus" placeholder="$0" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Descripción</label>
+                        <input type="text" id="modalTransferDescription" class="w-full bg-gray-800/80 border border-gray-700 rounded-xl px-4 py-3 input-focus" placeholder="Motivo de la transferencia">
+                    </div>
+                </div>
+                
+                <div class="flex space-x-4 mt-6">
+                    <button type="button" onclick="toggleModal('transferModal')" class="flex-1 px-6 py-3.5 bg-gray-800 rounded-xl hover:bg-gray-700 transition font-medium border border-gray-700">Cancelar</button>
+                    <button type="submit" class="flex-1 gradient-accent px-6 py-3.5 rounded-xl font-semibold btn-hover">Transferir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // DATABASE & STATE MANAGEMENT
+        // ============================================
+        
+        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+        let cajaChica = parseFloat(localStorage.getItem('cajaChica')) || 0;
+        let cajaGrande = parseFloat(localStorage.getItem('cajaGrande')) || 0;
+        
+        const categories = {
+            income: ['salario', 'ventas', 'inversiones', 'otros_ingresos'],
+            expense: ['alimentos', 'transporte', 'servicios', 'entretenimiento', 'salud', 'educacion', 'otros_gastos']
+        };
+
+        const categoryNames = {
+            salario: 'Salario',
+            ventas: 'Ventas',
+            inversiones: 'Inversiones',
+            otros_ingresos: 'Otros Ingresos',
+            alimentos: 'Alimentos',
+            transporte: 'Transporte',
+            servicios: 'Servicios',
+            entretenimiento: 'Entretenimiento',
+            salud: 'Salud',
+            educacion: 'Educación',
+            otros_gastos: 'Otros Gastos'
+        };
+
+        const categoryIcons = {
+            salario: '💼',
+            ventas: '🛒',
+            inversiones: '📈',
+            otros_ingresos: '💰',
+            alimentos: '🍔',
+            transporte: '🚗',
+            servicios: '🏠',
+            entretenimiento: '🎬',
+            salud: '🏥',
+            educacion: '📚',
+            otros_gastos: '📦'
+        };
+
+        // ============================================
+        // FORMAT FUNCTIONS (Colombian Pesos)
+        // ============================================
+        
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('es-CO', {
+                style: 'currency',
+                currency: 'COP',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeCharts();
+            updateDashboard();
+            loadTransactions();
+            generateAIRecommendations();
+            calculateRiskLevel();
+            
+            // Set default date to today
+            document.getElementById('transDate').valueAsDate = new Date();
+            
+            // Update last update time
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+        });
+
+        // ============================================
+        // NAVIGATION
+        // ============================================
+        
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-gray-800/50');
+            });
+            event.target.closest('.nav-btn')?.classList.add('active', 'bg-gray-800/50');
+        }
+
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+        }
+
+        // ============================================
+        // TRANSACTION MANAGEMENT
+        // ============================================
+        
+        function addTransaction(event) {
+            event.preventDefault();
+            
+            const transaction = {
+                id: Date.now(),
+                type: document.getElementById('transType').value,
+                amount: parseFloat(document.getElementById('transAmount').value),
+                date: document.getElementById('transDate').value,
+                category: document.getElementById('transCategory').value,
+                box: document.getElementById('transBox').value,
+                paymentMethod: document.getElementById('transPayment').value,
+                description: document.getElementById('transDescription').value || categoryNames[document.getElementById('transCategory').value],
+                priority: document.getElementById('transPriority').value,
+                createdAt: new Date().toISOString()
+            };
+            
+            transactions.push(transaction);
+            saveData();
+            
+            // Update balances
+            if (transaction.type === 'income') {
+                if (transaction.box === 'chica') {
+                    cajaChica += transaction.amount;
+                } else {
+                    cajaGrande += transaction.amount;
+                }
+            } else {
+                if (transaction.box === 'chica') {
+                    cajaChica -= transaction.amount;
+                } else {
+                    cajaGrande -= transaction.amount;
+                }
+            }
+            
+            saveData();
+            updateDashboard();
+            loadTransactions();
+            generateAIRecommendations();
+            calculateRiskLevel();
+            
+            toggleModal('addTransactionModal');
+            document.getElementById('transactionForm').reset();
+            document.getElementById('transDate').valueAsDate = new Date();
+            
+            showNotification('✅ Movimiento guardado exitosamente', 'success');
+        }
+
+        function deleteTransaction(id) {
+            if (confirm('¿Estás seguro de eliminar esta transacción?')) {
+                const transaction = transactions.find(t => t.id === id);
+                if (transaction) {
+                    if (transaction.type === 'income') {
+                        if (transaction.box === 'chica') {
+                            cajaChica -= transaction.amount;
+                        } else {
+                            cajaGrande -= transaction.amount;
+                        }
+                    } else {
+                        if (transaction.box === 'chica') {
+                            cajaChica += transaction.amount;
+                        } else {
+                            cajaGrande += transaction.amount;
+                        }
+                    }
+                }
+                
+                transactions = transactions.filter(t => t.id !== id);
+                saveData();
+                updateDashboard();
+                loadTransactions();
+                generateAIRecommendations();
+                calculateRiskLevel();
+                
+                showNotification('🗑️ Transacción eliminada', 'success');
+            }
+        }
+
+        function loadTransactions() {
+            const filterType = document.getElementById('filterType').value;
+            const filterMonth = document.getElementById('filterMonth').value;
+            
+            let filtered = [...transactions];
+            
+            if (filterType !== 'all') {
+                filtered = filtered.filter(t => t.type === filterType);
+            }
+            
+            if (filterMonth !== 'all') {
+                filtered = filtered.filter(t => new Date(t.date).getMonth() + 1 === parseInt(filterMonth));
+            }
+            
+            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Update table
+            const tbody = document.getElementById('transactionsTable');
+            tbody.innerHTML = filtered.slice(0, 50).map(t => `
+                <tr class="border-b border-gray-800 hover:bg-gray-800/30 transition">
+                    <td class="py-4">${formatDate(t.date)}</td>
+                    <td class="py-4 font-medium">${t.description}</td>
+                    <td class="py-4"><span class="px-3 py-1.5 bg-gray-800 rounded-xl text-xs font-medium border border-gray-700">${categoryIcons[t.category]} ${categoryNames[t.category]}</span></td>
+                    <td class="py-4">
+                        <span class="px-3 py-1.5 rounded-xl text-xs font-medium ${t.type === 'income' ? 'bg-primary-900/50 text-primary-400 border border-primary-700/50' : 'bg-red-900/50 text-red-400 border border-red-700/50'}">
+                            ${t.type === 'income' ? '💚 Ingreso' : '❤️ Egreso'}
+                        </span>
+                    </td>
+                    <td class="py-4">
+                        <span class="px-3 py-1.5 rounded-xl text-xs font-medium ${t.box === 'chica' ? 'bg-primary-900/50 text-primary-400 border border-primary-700/50' : 'bg-accent-900/50 text-accent-400 border border-accent-700/50'}">
+                            ${t.box === 'chica' ? '🟢 Chica' : '🔵 Grande'}
+                        </span>
+                    </td>
+                    <td class="py-4 font-semibold ${t.type === 'income' ? 'text-primary-400' : 'text-red-400'}">
+                        ${t.type === 'income' ? '+' : '-'}${formatCurrency(t.amount)}
+                    </td>
+                    <td class="py-4">
+                        <button onclick="deleteTransaction(${t.id})" class="text-red-400 hover:text-red-300 text-sm font-medium px-3 py-1.5 hover:bg-red-900/30 rounded-lg transition">Eliminar</button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Update recent transactions
+            const recentTbody = document.getElementById('recentTransactions');
+            if (filtered.length === 0) {
+                recentTbody.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        <p>No hay transacciones registradas</p>
+                        <button onclick="toggleModal('addTransactionModal')" class="text-primary-400 hover:text-primary-300 text-sm mt-2">+ Agregar primera transacción</button>
+                    </div>
+                `;
+            } else {
+                recentTbody.innerHTML = filtered.slice(0, 5).map(t => `
+                    <div class="flex items-center justify-between p-4 bg-gray-800/60 rounded-xl border border-gray-700/50 hover:border-gray-600/50 transition">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-11 h-11 ${t.type === 'income' ? 'gradient-primary' : 'gradient-danger'} rounded-xl flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${t.type === 'income' ? 'M7 11l5-5m0 0l5 5m-5-5v12' : 'M17 13l-5 5m0 0l-5-5m5 5V6'}"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="font-medium">${t.description}</p>
+                                <p class="text-sm text-gray-400">${formatDate(t.date)} • ${categoryIcons[t.category]} ${categoryNames[t.category]}</p>
+                            </div>
+                        </div>
+                        <span class="font-semibold ${t.type === 'income' ? 'text-primary-400' : 'text-red-400'}">
+                            ${t.type === 'income' ? '+' : '-'}${formatCurrency(t.amount)}
+                        </span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // ============================================
+        // TRANSFER MANAGEMENT
+        // ============================================
+        
+        function transferMoney(boxType) {
+            document.getElementById('modalTransferFrom').value = boxType;
+            document.getElementById('modalTransferTo').value = boxType === 'chica' ? 'grande' : 'chica';
+            toggleModal('transferModal');
+        }
+
+        function executeTransfer(event) {
+            if (event) event.preventDefault();
+            
+            const from = document.getElementById('modalTransferFrom').value;
+            const to = document.getElementById('modalTransferTo').value;
+            const amount = parseFloat(document.getElementById('modalTransferAmount').value);
+            const description = document.getElementById('modalTransferDescription').value || 'Transferencia entre cajas';
+            
+            if (from === 'chica' && cajaChica < amount) {
+                showNotification('❌ Saldo insuficiente en Caja Chica', 'error');
+                return;
+            }
+            
+            if (from === 'grande' && cajaGrande < amount) {
+                showNotification('❌ Saldo insuficiente en Caja Grande', 'error');
+                return;
+            }
+            
+            // Execute transfer
+            if (from === 'chica') {
+                cajaChica -= amount;
+                cajaGrande += amount;
+            } else {
+                cajaGrande -= amount;
+                cajaChica += amount;
+            }
+            
+            // Record transfer transactions
+            transactions.push({
+                id: Date.now(),
+                type: 'expense',
+                amount: amount,
+                date: new Date().toISOString().split('T')[0],
+                category: 'otros_gastos',
+                box: from,
+                paymentMethod: 'transferencia',
+                description: `Transferencia a Caja ${to === 'chica' ? 'Chica' : 'Grande'}: ${description}`,
+                priority: 'medio',
+                createdAt: new Date().toISOString()
+            });
+            
+            transactions.push({
+                id: Date.now() + 1,
+                type: 'income',
+                amount: amount,
+                date: new Date().toISOString().split('T')[0],
+                category: 'otros_ingresos',
+                box: to,
+                paymentMethod: 'transferencia',
+                description: `Transferencia desde Caja ${from === 'chica' ? 'Chica' : 'Grande'}: ${description}`,
+                priority: 'medio',
+                createdAt: new Date().toISOString()
+            });
+            
+            saveData();
+            updateDashboard();
+            loadTransactions();
+            toggleModal('transferModal');
+            
+            showNotification('✅ Transferencia realizada exitosamente', 'success');
+        }
+
+        // ============================================
+        // DASHBOARD UPDATES
+        // ============================================
+        
+        function updateDashboard() {
+            const totalBalance = cajaChica + cajaGrande;
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            
+            const monthlyTransactions = transactions.filter(t => {
+                const date = new Date(t.date);
+                return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+            });
+            
+            const monthlyIncome = monthlyTransactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const monthlyExpenses = monthlyTransactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const savingsRate = monthlyIncome > 0 ? ((monthlyIncome - monthlyExpenses) / monthlyIncome * 100) : 0;
+            
+            // Update summary cards
+            document.getElementById('totalBalance').textContent = formatCurrency(totalBalance);
+            document.getElementById('monthlyIncome').textContent = formatCurrency(monthlyIncome);
+            document.getElementById('monthlyExpenses').textContent = formatCurrency(monthlyExpenses);
+            document.getElementById('savingsRate').textContent = `${savingsRate.toFixed(1)}%`;
+            
+            // Update cash boxes
+            document.getElementById('cajaChicaBalance').textContent = formatCurrency(cajaChica);
+            document.getElementById('cajaGrandeBalance').textContent = formatCurrency(cajaGrande);
+            document.getElementById('cajaChicaDetailBalance').textContent = formatCurrency(cajaChica);
+            document.getElementById('cajaGrandeDetailBalance').textContent = formatCurrency(cajaGrande);
+            
+            // Update progress bars
+            const cajaChicaLimit = 5000000;
+            const cajaGrandeGoal = 30000000;
+            
+            const cajaChicaPercentage = Math.min((cajaChica / cajaChicaLimit) * 100, 100);
+            const cajaGrandePercentage = Math.min((cajaGrande / cajaGrandeGoal) * 100, 100);
+            
+            document.getElementById('cajaChicaProgress').style.width = `${cajaChicaPercentage}%`;
+            document.getElementById('cajaGrandeProgress').style.width = `${cajaGrandePercentage}%`;
+            document.getElementById('cajaChicaPercentage').textContent = `${cajaChicaPercentage.toFixed(1)}%`;
+            document.getElementById('cajaGrandePercentage').textContent = `${cajaGrandePercentage.toFixed(1)}%`;
+            
+            // Update caja details
+            const cajaChicaSpent = monthlyTransactions
+                .filter(t => t.type === 'expense' && t.box === 'chica')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            document.getElementById('cajaChicaSpent').textContent = formatCurrency(cajaChicaSpent);
+            document.getElementById('cajaChicaAvailable').textContent = formatCurrency(cajaChicaLimit - cajaChicaSpent);
+            document.getElementById('cajaGrandeProgressText').textContent = `${cajaGrandePercentage.toFixed(1)}%`;
+            
+            // Calculate months covered
+            const avgMonthlyExpenses = monthlyExpenses || 1;
+            const monthsCovered = cajaGrande / avgMonthlyExpenses;
+            document.getElementById('monthsCovered').textContent = `${monthsCovered.toFixed(1)} meses`;
+            
+            // Update AI insights
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const dayOfMonth = new Date().getDate();
+            
+            document.getElementById('avgDailyExpense').textContent = formatCurrency(monthlyExpenses / dayOfMonth);
+            document.getElementById('avgDailyIncome').textContent = formatCurrency(monthlyIncome / dayOfMonth);
+            document.getElementById('dailyBalance').textContent = formatCurrency((monthlyIncome - monthlyExpenses) / dayOfMonth);
+            
+            // Load movements for cajas
+            loadCajaMovements();
+            
+            // Update charts
+            updateCharts();
+        }
+
+        function loadCajaMovements() {
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            
+            const cajaChicaMovements = transactions.filter(t => {
+                const date = new Date(t.date);
+                return t.box === 'chica' && date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+            }).slice(0, 10);
+            
+            const cajaGrandeMovements = transactions.filter(t => {
+                const date = new Date(t.date);
+                return t.box === 'grande' && date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+            }).slice(0, 10);
+            
+            document.getElementById('cajaChicaMovements').innerHTML = cajaChicaMovements.length > 0 ? 
+                cajaChicaMovements.map(t => `
+                    <div class="flex justify-between items-center p-3 bg-gray-800/60 rounded-xl">
+                        <span class="text-sm">${t.description}</span>
+                        <span class="font-medium ${t.type === 'income' ? 'text-primary-400' : 'text-red-400'}">
+                            ${t.type === 'income' ? '+' : '-'}${formatCurrency(t.amount)}
+                        </span>
+                    </div>
+                `).join('') : '<p class="text-gray-500 text-sm">Sin movimientos</p>';
+            
+            document.getElementById('cajaGrandeMovements').innerHTML = cajaGrandeMovements.length > 0 ? 
+                cajaGrandeMovements.map(t => `
+                    <div class="flex justify-between items-center p-3 bg-gray-800/60 rounded-xl">
+                        <span class="text-sm">${t.description}</span>
+                        <span class="font-medium ${t.type === 'income' ? 'text-primary-400' : 'text-red-400'}">
+                            ${t.type === 'income' ? '+' : '-'}${formatCurrency(t.amount)}
+                        </span>
+                    </div>
+                `).join('') : '<p class="text-gray-500 text-sm">Sin movimientos</p>';
+        }
+
+        // ============================================
+        // CHARTS
+        // ============================================
+        
+        let incomeExpenseChartInstance = null;
+        let categoriesChartInstance = null;
+
+        function initializeCharts() {
+            Chart.defaults.color = '#9ca3af';
+            Chart.defaults.borderColor = '#374151';
+            
+            // Income vs Expense Chart
+            const ctx1 = document.getElementById('incomeExpenseChart').getContext('2d');
+            incomeExpenseChartInstance = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Ingresos',
+                            data: [],
+                            borderColor: '#22c55e',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#22c55e'
+                        },
+                        {
+                            label: 'Egresos',
+                            data: [],
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#ef4444'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: '#374151' },
+                            ticks: { 
+                                color: '#9ca3af',
+                                callback: function(value) {
+                                    return '$' + (value / 1000000).toFixed(0) + 'M';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { color: '#374151' },
+                            ticks: { color: '#9ca3af' }
+                        }
+                    }
+                }
+            });
+
+            // Categories Chart
+            const ctx2 = document.getElementById('categoriesChart').getContext('2d');
+            categoriesChartInstance = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#22c55e', '#3b82f6', '#8b5cf6', '#f59e0b',
+                            '#ef4444', '#ec4899', '#6b7280'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { 
+                                color: '#9ca3af',
+                                padding: 15,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        function updateCharts() {
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            
+            // Last 30 days data
+            const last30Days = [];
+            const incomeData = [];
+            const expenseData = [];
+            
+            for (let i = 29; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                last30Days.push(date.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' }));
+                
+                const dayTransactions = transactions.filter(t => t.date === dateStr);
+                incomeData.push(dayTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0));
+                expenseData.push(dayTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0));
+            }
+            
+            incomeExpenseChartInstance.data.labels = last30Days;
+            incomeExpenseChartInstance.data.datasets[0].data = incomeData;
+            incomeExpenseChartInstance.data.datasets[1].data = expenseData;
+            incomeExpenseChartInstance.update();
+            
+            // Categories data
+            const monthlyExpenses = transactions.filter(t => {
+                const date = new Date(t.date);
+                return t.type === 'expense' && date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+            });
+            
+            const categoryTotals = {};
+            categories.expense.forEach(cat => {
+                categoryTotals[cat] = monthlyExpenses.filter(t => t.category === cat).reduce((sum, t) => sum + t.amount, 0);
+            });
+            
+            categoriesChartInstance.data.labels = categories.expense.map(cat => categoryNames[cat]);
+            categoriesChartInstance.data.datasets[0].data = Object.values(categoryTotals);
+            categoriesChartInstance.update();
+        }
+
+        // ============================================
+        // AI ASSISTANT
+        // ============================================
+        
+        function generateAIRecommendations() {
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            
+            const monthlyTransactions = transactions.filter(t => {
+                const date = new Date(t.date);
+                return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+            });
+            
+            const monthlyIncome = monthlyTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const monthlyExpenses = monthlyTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const savingsRate = monthlyIncome > 0 ? ((monthlyIncome - monthlyExpenses) / monthlyIncome * 100) : 0;
+            
+            const recommendations = [];
+            
+            if (savingsRate < 20 && monthlyIncome > 0) {
+                recommendations.push({
+                    icon: '💡',
+                    text: `Tu tasa de ahorro es ${savingsRate.toFixed(1)}%. El objetivo recomendado es 20%. Considera reducir gastos en categorías no esenciales.`,
+                    type: 'warning'
+                });
+            }
+            
+            if (cajaGrande < monthlyExpenses * 3 && monthlyExpenses > 0) {
+                recommendations.push({
+                    icon: '⚠️',
+                    text: `Tu fondo de emergencia cubre ${(cajaGrande / (monthlyExpenses || 1)).toFixed(1)} meses. Lo ideal es tener 3-6 meses de gastos.`,
+                    type: 'warning'
+                });
+            }
+            
+            // Find top expense category
+            const categoryTotals = {};
+            categories.expense.forEach(cat => {
+                categoryTotals[cat] = monthlyTransactions.filter(t => t.type === 'expense' && t.category === cat).reduce((sum, t) => sum + t.amount, 0);
+            });
+            
+            const topCategory = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])[0];
+            if (topCategory && topCategory[1] > monthlyExpenses * 0.3) {
+                recommendations.push({
+                    icon: '📊',
+                    text: `${categoryNames[topCategory[0]]} representa ${(topCategory[1] / (monthlyExpenses || 1) * 100).toFixed(1)}% de tus gastos. Revisa si puedes optimizar esta categoría.`,
+                    type: 'info'
+                });
+            }
+            
+            if (monthlyIncome > monthlyExpenses && monthlyIncome > 0) {
+                recommendations.push({
+                    icon: '✅',
+                    text: `¡Excelente! Este mes tienes un balance positivo de ${formatCurrency(monthlyIncome - monthlyExpenses)}. Considera destinarlo a tu Caja Grande.`,
+                    type: 'success'
+                });
+            }
+            
+            if (recommendations.length === 0 && transactions.length === 0) {
+                recommendations.push({
+                    icon: '🎯',
+                    text: 'Comienza registrando tus primeros movimientos para recibir recomendaciones personalizadas.',
+                    type: 'info'
+                });
+            }
+            
+            if (recommendations.length === 0 && transactions.length > 0) {
+                recommendations.push({
+                    icon: '🎯',
+                    text: 'Tus finanzas se ven saludables. Sigue manteniendo el control de tus gastos y ahorros.',
+                    type: 'success'
+                });
+            }
+            
+            const container = document.getElementById('aiRecommendations');
+            container.innerHTML = recommendations.map(rec => `
+                <div class="p-4 bg-gray-800/60 rounded-xl border-l-4 ${rec.type === 'warning' ? 'border-yellow-500' : rec.type === 'success' ? 'border-primary-500' : 'border-accent-500'}">
+                    <div class="flex items-start space-x-3">
+                        <span class="text-xl">${rec.icon}</span>
+                        <p class="text-sm text-gray-300">${rec.text}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function calculateRiskLevel() {
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            
+            const monthlyTransactions = transactions.filter(t => {
+                const date = new Date(t.date);
+                return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+            });
+            
+            const monthlyIncome = monthlyTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const monthlyExpenses = monthlyTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            
+            let riskLevel = 'Medio';
+            let riskColor = 'border-yellow-500 text-yellow-400';
+            let riskBg = 'bg-yellow-500/20';
+            let riskDescription = 'Tus finanzas son estables pero hay espacio para mejorar.';
+            
+            const savingsRate = monthlyIncome > 0 ? ((monthlyIncome - monthlyExpenses) / monthlyIncome * 100) : 0;
+            const monthsCovered = cajaGrande / (monthlyExpenses || 1);
+            
+            if (savingsRate >= 20 && monthsCovered >= 6) {
+                riskLevel = 'Bajo';
+                riskColor = 'border-primary-500 text-primary-400';
+                riskBg = 'bg-primary-500/20';
+                riskDescription = '¡Excelente! Tienes finanzas muy saludables.';
+            } else if (savingsRate < 10 || monthsCovered < 3) {
+                riskLevel = 'Alto';
+                riskColor = 'border-red-500 text-red-400';
+                riskBg = 'bg-red-500/20';
+                riskDescription = 'Atención: Necesitas mejorar tu ahorro y fondo de emergencia.';
+            }
+            
+            const indicator = document.getElementById('riskIndicator');
+            indicator.className = `w-28 h-28 mx-auto rounded-full border-4 flex items-center justify-center mb-3 ${riskColor} ${riskBg}`;
+            indicator.innerHTML = `<span class="text-3xl font-bold">${riskLevel}</span>`;
+            
+            document.getElementById('riskDescription').textContent = riskDescription;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addChatMessage(message, 'user');
+            input.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                const response = generateAIResponse(message);
+                addChatMessage(response, 'ai');
+            }, 800);
+        }
+
+        function quickQuestion(question) {
+            document.getElementById('chatInput').value = question;
+            sendMessage();
+        }
+
+        function addChatMessage(message, sender) {
+            const container = document.getElementById('chatMessages');
+            const isUser = sender === 'user';
+            
+            const html = `
+                <div class="chat-message flex items-start space-x-3 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}">
+                    <div class="w-9 h-9 ${isUser ? 'bg-gray-700' : 'gradient-purple'} rounded-full flex items-center justify-center flex-shrink-0">
+                        ${isUser ? 
+                            '<span class="text-sm font-semibold">US</span>' : 
+                            '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>'
+                        }
+                    </div>
+                    <div class="${isUser ? 'bg-accent-600 rounded-tr-none' : 'bg-gray-800/80 rounded-tl-none'} rounded-2xl px-5 py-3 max-w-md border ${isUser ? 'border-accent-500/50' : 'border-gray-700/50'}">
+                        <p class="text-sm">${message}</p>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', html);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function generateAIResponse(question) {
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            
+            const monthlyTransactions = transactions.filter(t => {
+                const date = new Date(t.date);
+                return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+            });
+            
+            const monthlyIncome = monthlyTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const monthlyExpenses = monthlyTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const savingsRate = monthlyIncome > 0 ? ((monthlyIncome - monthlyExpenses) / monthlyIncome * 100) : 0;
+            
+            const q = question.toLowerCase();
+            
+            if (q.includes('tasa de ahorro') || q.includes('ahorro')) {
+                return `Tu tasa de ahorro actual es <strong>${savingsRate.toFixed(1)}%</strong>. El estándar recomendado es 20%. ${savingsRate >= 20 ? '¡Estás cumpliendo el objetivo! 🎉' : 'Te recomiendo reducir gastos en categorías no esenciales para alcanzar el 20%.'}`;
+            }
+            
+            if (q.includes('reducir gastos') || q.includes('ahorrar')) {
+                const categoryTotals = {};
+                categories.expense.forEach(cat => {
+                    categoryTotals[cat] = monthlyTransactions.filter(t => t.type === 'expense' && t.category === cat).reduce((sum, t) => sum + t.amount, 0);
+                });
+                
+                const topCategory = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])[0];
+                return `Tu mayor gasto es en <strong>${categoryNames[topCategory[0]]}</strong> (${formatCurrency(topCategory[1])}). Te sugiero: 1) Revisar suscripciones innecesarias, 2) Comparar precios antes de comprar, 3) Establecer un presupuesto semanal para esta categoría.`;
+            }
+            
+            if (q.includes('fondo de emergencia') || q.includes('emergencia')) {
+                const monthsCovered = cajaGrande / (monthlyExpenses || 1);
+                return `Tu fondo de emergencia cubre <strong>${monthsCovered.toFixed(1)} meses</strong> de gastos. Lo recomendado es 3-6 meses. ${monthsCovered >= 3 ? '¡Tienes un fondo saludable! 🛡️' : 'Te sugiero ahorrar ' + formatCurrency((3 * monthlyExpenses) - cajaGrande) + ' adicionales para alcanzar 3 meses.'}`;
+            }
+            
+            if (q.includes('análisis') || q.includes('mes')) {
+                return `<strong>Resumen del mes:</strong><br>• Ingresos: ${formatCurrency(monthlyIncome)}<br>• Egresos: ${formatCurrency(monthlyExpenses)}<br>• Balance: ${formatCurrency(monthlyIncome - monthlyExpenses)}<br>• Tasa de ahorro: ${savingsRate.toFixed(1)}%<br><br>${monthlyIncome > monthlyExpenses ? '¡Excelente trabajo! Tienes balance positivo. 🎉' : 'Atención: Tus gastos superan tus ingresos este mes. ⚠️'}`;
+            }
+            
+            return `Gracias por tu pregunta. Para darte una respuesta más precisa, puedo analizar: tu tasa de ahorro, fondo de emergencia, gastos por categoría, o proyecciones mensuales. ¿Qué te gustaría saber específicamente?`;
+        }
+
+        // ============================================
+        // REPORTS
+        // ============================================
+        
+        function generateReport() {
+            const period = document.getElementById('reportPeriod').value;
+            const month = parseInt(document.getElementById('reportMonth').value);
+            const year = parseInt(document.getElementById('reportYear').value);
+            
+            let filteredTransactions = transactions;
+            
+            if (period === 'monthly') {
+                filteredTransactions = transactions.filter(t => {
+                    const date = new Date(t.date);
+                    return date.getMonth() + 1 === month && date.getFullYear() === year;
+                });
+            } else if (period === 'yearly') {
+                filteredTransactions = transactions.filter(t => {
+                    const date = new Date(t.date);
+                    return date.getFullYear() === year;
+                });
+            }
+            
+            const totalIncome = filteredTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const totalExpenses = filteredTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            
+            document.getElementById('reportIncome').textContent = formatCurrency(totalIncome);
+            document.getElementById('reportExpenses').textContent = formatCurrency(totalExpenses);
+            document.getElementById('reportBalance').textContent = formatCurrency(totalIncome - totalExpenses);
+            
+            // Category breakdown
+            const categoryData = {};
+            [...categories.income, ...categories.expense].forEach(cat => {
+                const catIncome = filteredTransactions.filter(t => t.type === 'income' && t.category === cat).reduce((sum, t) => sum + t.amount, 0);
+                const catExpense = filteredTransactions.filter(t => t.type === 'expense' && t.category === cat).reduce((sum, t) => sum + t.amount, 0);
+                if (catIncome > 0 || catExpense > 0) {
+                    categoryData[cat] = { income: catIncome, expense: catExpense };
+                }
+            });
+            
+            const tbody = document.getElementById('reportTable');
+            tbody.innerHTML = Object.entries(categoryData).map(([cat, data]) => {
+                const balance = data.income - data.expense;
+                const percentage = totalExpenses > 0 ? (data.expense / totalExpenses * 100) : 0;
+                
+                return `
+                    <tr class="border-b border-gray-800 hover:bg-gray-800/30 transition">
+                        <td class="py-4">${categoryIcons[cat]} ${categoryNames[cat]}</td>
+                        <td class="py-4 text-primary-400">${formatCurrency(data.income)}</td>
+                        <td class="py-4 text-red-400">${formatCurrency(data.expense)}</td>
+                        <td class="py-4 font-semibold ${balance >= 0 ? 'text-primary-400' : 'text-red-400'}">${formatCurrency(balance)}</td>
+                        <td class="py-4">${percentage.toFixed(1)}%</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            showNotification('✅ Reporte generado exitosamente', 'success');
+        }
+
+        function exportReport(format) {
+            showNotification(`📥 Exportando reporte en formato ${format.toUpperCase()}...`, 'success');
+        }
+
+        // ============================================
+        // UTILITIES
+        // ============================================
+        
+        function saveData() {
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            localStorage.setItem('cajaChica', cajaChica.toString());
+            localStorage.setItem('cajaGrande', cajaGrande.toString());
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed bottom-6 right-6 px-6 py-4 rounded-2xl shadow-2xl z-50 ${type === 'success' ? 'gradient-primary' : 'gradient-danger'} text-white font-medium animate-slide-up border border-white/20`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(20px)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Event listeners for filters
+        document.getElementById('filterType').addEventListener('change', loadTransactions);
+        document.getElementById('filterMonth').addEventListener('change', loadTransactions);
+    </script>
+</body>
+</html>
+
